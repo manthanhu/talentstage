@@ -19,7 +19,17 @@ import {
   Lock,
   Heart,
   ArrowRight,
+  AlertCircle,
 } from "lucide-react";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { useAuth, useAppNotification } from "@/app/hooks";
+import {
+  validateEmail,
+  validatePassword,
+  validateDisplayName,
+} from "@/app/validators";
+import type { TalentCategory } from "@/app/types";
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -56,18 +66,19 @@ const slides = [
   },
 ];
 
-const talentCategories = [
-  { icon: Music, label: "Music", color: "#ec4899" },
-  { icon: Code, label: "Coding", color: "#3b82f6" },
-  { icon: Palette, label: "Art", color: "#f59e0b" },
-  { icon: Mic, label: "Speaking", color: "#7c3aed" },
-  { icon: Camera, label: "Film", color: "#06b6d4" },
-  { icon: BookOpen, label: "Research", color: "#10b981" },
-  { icon: Lightbulb, label: "Innovation", color: "#f472b6" },
-  { icon: Users, label: "Debate", color: "#a855f7" },
-  { icon: Heart, label: "Dance", color: "#ef4444" },
-  { icon: Globe, label: "Language", color: "#22d3ee" },
-];
+const talentCategories: { icon: any; label: TalentCategory; color: string }[] =
+  [
+    { icon: Music, label: "Music", color: "#ec4899" },
+    { icon: Code, label: "Coding", color: "#3b82f6" },
+    { icon: Palette, label: "Art", color: "#f59e0b" },
+    { icon: Mic, label: "Speaking", color: "#7c3aed" },
+    { icon: Camera, label: "Film", color: "#06b6d4" },
+    { icon: BookOpen, label: "Research", color: "#10b981" },
+    { icon: Lightbulb, label: "Innovation", color: "#f472b6" },
+    { icon: Users, label: "Debate", color: "#a855f7" },
+    { icon: Heart, label: "Dance", color: "#ef4444" },
+    { icon: Globe, label: "Language", color: "#22d3ee" },
+  ];
 
 const languages = [
   "English",
@@ -86,12 +97,23 @@ export default function OnboardingScreen({
   onComplete,
 }: OnboardingScreenProps) {
   const [step, setStep] = useState(0);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<TalentCategory[]>(
+    []
+  );
   const [selectedLang, setSelectedLang] = useState("English");
 
-  const totalSteps = slides.length + 2; // slides + categories + language
+  // Sign up form state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const toggleCategory = (label: string) => {
+  const { signup, isLoading: authLoading } = useAuth();
+  const { error: showError, success } = useAppNotification();
+
+  const totalSteps = slides.length + 3; // slides + signup + categories + language
+
+  const toggleCategory = (label: TalentCategory) => {
     setSelectedCategories((prev) =>
       prev.includes(label)
         ? prev.filter((c) => c !== label)
@@ -101,17 +123,70 @@ export default function OnboardingScreen({
     );
   };
 
-  const nextStep = () => {
+  const validateSignupForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    const emailVal = validateEmail(email);
+    if (!emailVal.isValid) newErrors.email = emailVal.error || "";
+
+    const passwordVal = validatePassword(password);
+    if (!passwordVal.isValid) newErrors.password = passwordVal.error || "";
+
+    const nameVal = validateDisplayName(displayName);
+    if (!nameVal.isValid) newErrors.displayName = nameVal.error || "";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSignup = async () => {
+    if (!validateSignupForm()) return;
+
+    const result = await signup(email, password, displayName);
+    if (result.success) {
+      success("Account created! Proceeding to setup...");
+      // Move to categories step
+      setStep(slides.length + 1);
+    } else {
+      showError(result.error || "Signup failed");
+    }
+  };
+
+  const nextStep = async () => {
+    // Sign up step (step = slides.length)
+    if (step === slides.length) {
+      await handleSignup();
+      return;
+    }
+
+    // Categories step (step = slides.length + 1)
+    if (step === slides.length + 1) {
+      if (selectedCategories.length === 0) {
+        showError("Please select at least one talent category");
+        return;
+      }
+      setStep(step + 1);
+      return;
+    }
+
+    // Language step (step = slides.length + 2)
+    if (step === slides.length + 2) {
+      success("Setup complete!");
+      // Brief pause then complete
+      setTimeout(onComplete, 300);
+      return;
+    }
+
+    // Regular slides
     if (step < totalSteps - 1) {
       setStep(step + 1);
-    } else {
-      onComplete();
     }
   };
 
   const isSlide = step < slides.length;
-  const isCategories = step === slides.length;
-  const isLanguage = step === slides.length + 1;
+  const isSignup = step === slides.length;
+  const isCategories = step === slides.length + 1;
+  const isLanguage = step === slides.length + 2;
 
   return (
     <div className="min-h-dvh flex flex-col relative overflow-hidden bg-bg-primary">
@@ -209,6 +284,76 @@ export default function OnboardingScreen({
             </motion.div>
           )}
 
+          {isSignup && (
+            <motion.div
+              key="signup"
+              initial={{ opacity: 0, x: 80 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -80 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center w-full"
+            >
+              <h2 className="text-2xl font-bold font-[family-name:var(--font-display)] mb-2 text-center">
+                Create Account
+              </h2>
+              <p className="text-text-secondary text-sm mb-8 text-center">
+                Join the talent community
+              </p>
+
+              <div className="space-y-4 w-full max-w-sm">
+                <Input
+                  label="Display Name"
+                  value={displayName}
+                  onChange={(e) => {
+                    setDisplayName(e.target.value);
+                    if (errors.displayName)
+                      setErrors({ ...errors, displayName: "" });
+                  }}
+                  error={errors.displayName}
+                  placeholder="Your name"
+                  fullWidth
+                />
+
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors({ ...errors, email: "" });
+                  }}
+                  error={errors.email}
+                  placeholder="you@example.com"
+                  fullWidth
+                />
+
+                <Input
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password)
+                      setErrors({ ...errors, password: "" });
+                  }}
+                  error={errors.password}
+                  placeholder="At least 8 characters"
+                  helpText="8+ chars, 1 uppercase, 1 number"
+                  fullWidth
+                />
+
+                {Object.keys(errors).length > 0 && (
+                  <div className="flex gap-2 p-3 rounded-lg bg-red-danger/10 border border-red-danger/30">
+                    <AlertCircle className="w-4 h-4 text-red-danger flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-danger">
+                      Please fix errors above
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
           {isCategories && (
             <motion.div
               key="categories"
@@ -252,7 +397,10 @@ export default function OnboardingScreen({
                           : {}
                       }
                     >
-                      <cat.icon className="w-4 h-4" style={isSelected ? { color: cat.color } : {}} />
+                      <cat.icon
+                        className="w-4 h-4"
+                        style={isSelected ? { color: cat.color } : {}}
+                      />
                       {cat.label}
                     </motion.button>
                   );
@@ -308,15 +456,18 @@ export default function OnboardingScreen({
 
       {/* Bottom CTA */}
       <div className="relative z-10 px-6 pb-12">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <Button
           onClick={nextStep}
-          className="w-full py-4 rounded-2xl gradient-purple-blue text-white font-semibold text-base flex items-center justify-center gap-2 glow-purple transition-all duration-300"
+          fullWidth
+          size="lg"
+          isLoading={authLoading && isSignup}
+          disabled={isSignup && authLoading}
         >
-          {step === totalSteps - 1 ? (
+          {isSignup ? (
+            <>Create Account</>
+          ) : step === totalSteps - 1 ? (
             <>
-              Get Started
+              Finish Setup
               <ArrowRight className="w-5 h-5" />
             </>
           ) : (
@@ -325,7 +476,7 @@ export default function OnboardingScreen({
               <ChevronRight className="w-5 h-5" />
             </>
           )}
-        </motion.button>
+        </Button>
       </div>
     </div>
   );
