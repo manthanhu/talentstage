@@ -28,7 +28,7 @@ TalentStage is a safety-first talent showcase platform designed for students, ed
 git clone https://github.com/yourusername/talentstage.git
 cd talentstage
 
-# Install dependencies
+# Install dependencies (IMPORTANT - don't skip this!)
 npm install
 
 # Create environment file
@@ -37,6 +37,10 @@ cp .env.local.example .env.local
 # Start development server
 npm run dev
 ```
+
+**⚠️ If you see "Module not found: Can't resolve 'zustand'" error:**
+- Run `npm install` again to install all dependencies
+- See [FIX_DEPENDENCIES.md](./FIX_DEPENDENCIES.md) for troubleshooting
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 

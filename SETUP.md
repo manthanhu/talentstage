@@ -7,12 +7,19 @@
 
 ## Installation Steps
 
-### 1. Clone & Install
+### 1. Clone & Install Dependencies ⚠️
 ```bash
 git clone <repository-url>
 cd talentstage
+
+# IMPORTANT: Install all dependencies (including zustand, testing libraries)
 npm install
 ```
+
+**If you see "Module not found: Can't resolve 'zustand'" error:**
+- This means dependencies weren't installed
+- Run `npm install` again
+- See [FIX_DEPENDENCIES.md](./FIX_DEPENDENCIES.md) for solutions
 
 ### 2. Environment Setup
 ```bash
