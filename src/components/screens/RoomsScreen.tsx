@@ -16,7 +16,7 @@ import {
   Radio,
   ChevronRight,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface RoomsScreenProps {
   navigateTo: (screen: Screen) => void;

@@ -177,3 +177,17 @@ export interface ErrorNotification {
 }
 
 export type Notification = SuccessNotification | ErrorNotification;
+
+// Screen Navigation Type
+export type Screen =
+  | "splash"
+  | "onboarding"
+  | "verify"
+  | "feed"
+  | "profile"
+  | "stages"
+  | "communities"
+  | "create"
+  | "rooms"
+  | "safety"
+  | "admin";

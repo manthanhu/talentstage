@@ -18,7 +18,7 @@ import {
   Settings,
   ExternalLink,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface ProfileScreenProps {
   navigateTo: (screen: Screen) => void;

@@ -22,7 +22,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface AdminScreenProps {
   navigateTo: (screen: Screen) => void;

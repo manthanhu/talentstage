@@ -15,7 +15,7 @@ import {
   Zap,
   ChevronRight,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface SafetyScreenProps {
   navigateTo: (screen: Screen) => void;

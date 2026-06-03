@@ -18,7 +18,7 @@ import {
   Eye,
   Tag,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface CreateScreenProps {
   navigateTo: (screen: Screen) => void;

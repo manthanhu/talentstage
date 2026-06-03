@@ -16,7 +16,7 @@ import {
   Award,
   TrendingUp,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface StagesScreenProps {
   navigateTo: (screen: Screen) => void;

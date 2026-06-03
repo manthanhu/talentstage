@@ -20,7 +20,7 @@ import {
   Heart,
   ThumbsUp,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface CommunitiesScreenProps {
   navigateTo: (screen: Screen) => void;

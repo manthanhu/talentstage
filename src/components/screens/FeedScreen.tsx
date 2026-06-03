@@ -20,7 +20,7 @@ import {
   Headphones,
   Zap,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface FeedScreenProps {
   navigateTo: (screen: Screen) => void;
