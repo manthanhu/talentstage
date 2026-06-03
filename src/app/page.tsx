@@ -14,37 +14,32 @@ import RoomsScreen from "@/components/screens/RoomsScreen";
 import SafetyScreen from "@/components/screens/SafetyScreen";
 import AdminScreen from "@/components/screens/AdminScreen";
 import BottomNav from "@/components/ui/BottomNav";
+import { useAuth } from "./hooks";
+import type { Screen } from "./types";
 
-export type Screen =
-  | "splash"
-  | "onboarding"
-  | "verify"
-  | "feed"
-  | "profile"
-  | "stages"
-  | "communities"
-  | "create"
-  | "rooms"
-  | "safety"
-  | "admin";
+const screensWithNav: Screen[] = [
+  "feed",
+  "profile",
+  "stages",
+  "communities",
+  "create",
+  "rooms",
+  "safety",
+];
 
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("splash");
   const [showNav, setShowNav] = useState(false);
-
-  const screensWithNav: Screen[] = [
-    "feed",
-    "profile",
-    "stages",
-    "communities",
-    "create",
-    "rooms",
-    "safety",
-  ];
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    // Auto-redirect authenticated users from splash/onboarding to feed
+    if (isAuthenticated && currentScreen === "splash") {
+      setCurrentScreen("feed");
+    }
+
     setShowNav(screensWithNav.includes(currentScreen));
-  }, [currentScreen]);
+  }, [currentScreen, isAuthenticated]);
 
   const navigateTo = (screen: Screen) => {
     setCurrentScreen(screen);

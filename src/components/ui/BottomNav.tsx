@@ -11,7 +11,7 @@ import {
   Shield,
   LayoutDashboard,
 } from "lucide-react";
-import type { Screen } from "@/app/page";
+import type { Screen } from "@/app/types";
 
 interface BottomNavProps {
   currentScreen: Screen;
@@ -43,6 +43,7 @@ export default function BottomNav({
           onClick={() => navigateTo("rooms")}
           className="glass rounded-full p-2.5 hover:glow-blue transition-all duration-300 group"
           title="Voice Rooms"
+          aria-label="Voice Rooms"
         >
           <Search className="w-4 h-4 text-text-secondary group-hover:text-blue-neon transition-colors" />
         </button>
@@ -50,6 +51,7 @@ export default function BottomNav({
           onClick={() => navigateTo("safety")}
           className="glass rounded-full p-2.5 hover:glow-purple transition-all duration-300 group"
           title="Safety"
+          aria-label="Safety Center"
         >
           <Shield className="w-4 h-4 text-text-secondary group-hover:text-green-safe transition-colors" />
         </button>
@@ -57,12 +59,17 @@ export default function BottomNav({
           onClick={() => navigateTo("admin")}
           className="glass rounded-full p-2.5 hover:glow-purple transition-all duration-300 group"
           title="Admin Dashboard"
+          aria-label="Admin Dashboard"
         >
           <LayoutDashboard className="w-4 h-4 text-text-secondary group-hover:text-purple-glow transition-colors" />
         </button>
       </div>
 
-      <nav className="glass-strong rounded-2xl px-2 py-2 flex items-center justify-around">
+      <nav
+        className="glass-strong rounded-2xl px-2 py-2 flex items-center justify-around"
+        role="navigation"
+        aria-label="Main navigation"
+      >
         {navItems.map((item) => {
           const isActive = currentScreen === item.screen;
           const isCreate = item.screen === "create";
@@ -71,6 +78,8 @@ export default function BottomNav({
             <button
               key={item.screen}
               onClick={() => navigateTo(item.screen)}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
               className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 rounded-xl transition-all duration-300 ${
                 isActive
                   ? "text-purple-glow"

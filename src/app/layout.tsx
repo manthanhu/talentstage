@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { NotificationContainer } from "@/components/NotificationContainer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +36,18 @@ export const metadata: Metadata = {
       "A verified, privacy-first platform for safe talent discovery.",
     type: "website",
   },
+  robots: "index, follow",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -42,11 +56,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${outfit.variable} font-[family-name:var(--font-body)] antialiased`}
+        className={`${inter.variable} ${outfit.variable} font-[family-name:var(--font-body)] antialiased bg-bg-primary`}
       >
-        {children}
+        <ErrorBoundary>
+          {children}
+          <NotificationContainer />
+        </ErrorBoundary>
       </body>
     </html>
   );
